@@ -32,7 +32,7 @@ function _draw()
     draw_player()
     p_idle_anim()
 
-    draw_npc(dylFish,8,3)
+    draw_npc(dilFish,8,3)
     npc_anim()
 
     print(focus.x)
@@ -61,13 +61,13 @@ end
 function make_npcs()
     npc={ 130, 128, 160, 176, 144, 162 }
 
-    --order of npcs appearing + first sprite #
+    --npcs + first sprite #
     dog = 130 --save point dog
-    yeFish = 128 --generic fish
+    yellowFish = 128 --generic yellow fish
     swFish = 160 --swedish fish
     mumKrew = 176 --mumblekrew
-    dEel = 144 --deal eel
-    dylFish = 162 -- dylan fish
+    deel = 144 --deal eel
+    dilFish = 162 -- dilly fish
 
 end
 
@@ -115,18 +115,18 @@ end
 function npc_anim()
     if((tick%2) == 0) then
         dog=130
-        yeFish=128
+        yellowFish=128
         swFish = 160 
         mumKrew = 176 
-        dEel = 144 
-        dylFish = 162
+        deel = 144 
+        dilFish = 162
     else
         dog=131
-        yeFish=129
+        yellowFish=129
         swFish=161
         mumKrew=177
-        dEel=145
-        dylFish=163
+        deel=145
+        dilFish=163
     end
 end
 
