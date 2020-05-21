@@ -124,7 +124,7 @@ function dtb_draw()
         end
         rectfill(2,125-dislineslength*8,125,125,1)
         if dtb_curline>0 and #dtb_dislines[#dtb_dislines]==#dtb_queu[1][dtb_curline] then
-            print("\x8e",118,120,6)
+            print("\143",118,120,6)
         end
         for i=1,dislineslength do
             print(dtb_dislines[i],4,i*8+119-(dislineslength+offset)*8,7)
@@ -160,7 +160,7 @@ function _update()
     if (t()%2 ==0) tick+=1
 
     player_spin()
-    create_npc(dilFish)
+    create_npc(fishFish)
     
 end
 
@@ -170,9 +170,9 @@ function _draw()
     draw_player()
     p_idle_anim()
 
-    draw_npc(dilFish.sprite,8,3)
+    draw_npc(fishFish.sprite,8,3)
     npc_anim()
-    if (btnp(5)) npc_talk()
+    if (btnp(4)) npc_talk()
 
     print(focus.x)
     print(focus.y)
@@ -284,7 +284,8 @@ end
 function npc_anim()
     if((tick%2) == 0) then
         dog.sprite=130
-        fishFish.sprite=128
+        yellowFish.sprite=128
+        fishFish.sprite=146
         swFish.sprite = 160 
         mumKrew.sprite = 176 
         deel.sprite = 144 
@@ -292,7 +293,8 @@ function npc_anim()
         namazu.sprite = 178
     else
         dog.sprite =131
-        fishFish.sprite=129
+        yellowFish.sprite=129
+        fishFish.sprite=147
         swFish.sprite=161
         mumKrew.sprite=177
         deel.sprite=145
@@ -371,7 +373,9 @@ end
 function npc_talk()
     --tile checks npc sprite
     if(tile_check(focus.x,focus.y,npc)) then
-        dtb_disp("yes yes")
+        if(fishFish.spawn == true) then
+            dtb_disp("flashyn!")
+        end
     end
 end
 
