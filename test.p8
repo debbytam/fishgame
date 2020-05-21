@@ -137,8 +137,10 @@ end
 --https://www.lexaloffle.com/bbs/?tid=28465
 --https://www.lexaloffle.com/bbs/?tid=28465
 
+
 function _init()
     dtb_init(3)
+
     make_player()
     make_npcs()
     make_map()
@@ -147,6 +149,10 @@ function _init()
     game_over = false
     btnpress=0
     tick=0
+    frameNum=30
+
+    npcSpoken=false
+    textCD=0
 
     focus={}
     focus.x=p.x
@@ -156,8 +162,31 @@ end
 
 function _update()
     dtb_update()
-    --tick increments every other frame 
+    --tick increments every other second 
     if (t()%2 ==0) tick+=1
+    --frame counter goes down 1 every update loop
+    --resets to 30 at 0
+    if(frameNum == 0) then
+        frameNum=30
+    else
+        frameNum-=1
+    end
+
+    if(npcSpoken == false) then
+        --npc not been spoken too yet
+        if (btnp(4)) npc_talk()
+    else
+        --npc has been spoken to, cooldown+1 every frame
+        textCD +=1
+        --if delay has run out
+        if(textCD > 20) then
+            --check for input again 
+            if (btnp(4)) npc_talk()
+            --reset variables
+            textCD=0
+            npcSpoken = false
+        end
+    end
 
     player_spin()
     create_npc(fishFish)
@@ -172,11 +201,13 @@ function _draw()
 
     draw_npc(fishFish.sprite,8,3)
     npc_anim()
-    if (btnp(4)) npc_talk()
+
 
     print(focus.x)
     print(focus.y)
-    print(mget(focus.x,focus.y))
+    print(time())
+    print(textCD)
+    print(frameNum)
     --draw text boxes
     dtb_draw()
 end
@@ -249,13 +280,13 @@ function p_idle_anim()
     -- if last time btn pressed - time game has been running is less than 2 seconds
     if (cur - btnpress > 2) then
         if(focus.dir=='left') then 
-            if((tick%2) == 0) then
+            if(frameNum < 15) then
                 p.sprite=17
             else
                 p.sprite=33
             end
         else
-            if((tick%2) == 0) then
+            if(frameNum < 15) then
                 p.sprite=16
             else
                 p.sprite=32
@@ -282,7 +313,7 @@ function draw_npc(npcSprite,x,y)
 end
 
 function npc_anim()
-    if((tick%2) == 0) then
+    if(frameNum > 15) then
         dog.sprite=130
         yellowFish.sprite=128
         fishFish.sprite=146
@@ -374,7 +405,8 @@ function npc_talk()
     --tile checks npc sprite
     if(tile_check(focus.x,focus.y,npc)) then
         if(fishFish.spawn == true) then
-            dtb_disp("flashyn!")
+            dtb_disp("brrap")
+            npcSpoken = true
         end
     end
 end
