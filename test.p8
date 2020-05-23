@@ -151,8 +151,10 @@ function _init()
     tick=0
     frameNum=30
 
-    npcSpoken=false
+    textInit=false
     textCD=0
+    delay=120
+    count=0
 
     focus={}
     focus.x=p.x
@@ -172,21 +174,10 @@ function _update()
         frameNum-=1
     end
 
-    if(textCD==0) then
-        --npc not been spoken too yet just initiate dialogue checks
-        if (btnp(4)) npc_talk()
-    else
-        --npc has been spoken to, cooldown+1 every frame
-        --end of npc dialogue sets textCD to 10, delay is actually 40 frames 
-        textCD +=1
-        --if delay has run out
-        if(textCD > 50) then
-            --check for input again 
-            if (btnp(4)) npc_talk()
-            --reset timer
-            textCD=0
-        end
-    end
+
+    if (btnp(4)) npc_talk()
+    --1 tick has passed reset text trigger
+    if(tick - textCD >1 and count==2) textInit=false
 
     player_spin()
     create_npc(yellowFish)
@@ -205,11 +196,10 @@ function _draw()
     npc_anim()
 
 
-    print(focus.x)
-    print(focus.y)
+    print(tick)
+    print(count)
     print(textCD)
-    print(mget(focus.x,focus.y))
-    print(npcSpoken)
+    print(textInit)
     --draw text boxes
     dtb_draw()
 end
@@ -238,10 +228,14 @@ function make_npcs()
     dog= {}
     dog.sprite = 130 --save point dog
     dog.spawn = false
+    dog.string1 = "bork bork..."
+    dog.string2 = ">he seems to like you"
 
     yellowFish = {}
     yellowFish.sprite = 128 --generic yellow fish
     yellowFish.spawn = false
+    yellowFish.string1 = "hey"
+    yellowFish.string2 = "you going out for a walk?"
 
     fishFish = {}
     fishFish.sprite = 146 -- Fish fish 
@@ -403,38 +397,43 @@ end
 function npc_talk()
     --tile checks npc sprite
     if(tile_check(focus.x,focus.y,npc)) then
-        --get sprite # and pass to check name, returns text string 
-        npcSprite_talk=mget(focus.x,focus.y)
+        if(textInit==false) then 
+            --get sprite # and pass to check name, returns text string 
+            npcSprite_talk=mget(focus.x,focus.y)
+            textInit=true 
 
-        if(npcSprite_talk == yellowFish.sprite) then
-            dtb_disp("hey man")
-            dtb_disp("you heading out for a walk?",textDelay())
+            if(npcSprite_talk == yellowFish.sprite) then
+                dtb_disp(yellowFish.string1,function() count+=1 end)
+                dtb_disp(yellowFish.string2,function() count+=1 end)
+            end
+            if(npcSprite_talk == dog.sprite) then
+                dtb_disp(dog.string1,function() count+=1 end)
+                dtb_disp(dog.string2,function() count+=1 end)
+            end
+            if(npcSprite_talk == fishFish.sprite) then
+                dtb_disp("flashyn",function() count+=1 end)
+            end
+            if(npcSprite_talk == swFish.sprite) then
+            end
+            if(npcSprite_talk == mumKrew.sprite) then
+            end
+            if(npcSprite_talk == deel.sprite) then
+            end
+            if(npcSprite_talk == dilFish.sprite) then
+            end
+            if(npcSprite_talk == namazu.sprite) then
+            end
+            --once text has ended 
+            if(count == 2) then
+                --save time
+                textCD =tick
+                --reset text counter 
+                count=0
+            end
         end
-        if(npcSprite_talk == dog.sprite) then
-            dtb_disp("borkbork...")
-            dtb_disp(">he seems to like you",textDelay())
-        end
-        if(npcSprite_talk == fishFish.sprite) then
-            dtb_disp("flashyn",textDelay())
-        end
-        if(npcSprite_talk == swFish.sprite) then
-        end
-        if(npcSprite_talk == mumKrew.sprite) then
-        end
-        if(npcSprite_talk == deel.sprite) then
-        end
-        if(npcSprite_talk == dilFish.sprite) then
-        end
-        if(npcSprite_talk == namazu.sprite) then
-        end
-
     end
 end
 
-function textDelay()
-    -- above the trigger # of 0, actual delay is then 40 frames
-    textCD=10
-end
 __gfx__
 00000000000000000000000000000000000660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000006000000000000000000006066000060060000000000000000000000000000000000000000000000000000000000000000000000000000000000
