@@ -122,12 +122,12 @@ function dtb_draw()
         if dtb_curline then
             offset=dislineslength-dtb_curline
         end
-        rectfill(2+mapDrawx,(125-dislineslength*8),125+mapDrawx,125,1)
+        rectfill(2+camx,(125-dislineslength*8)+camy,125+camx,125+camy,1)
         if dtb_curline>0 and #dtb_dislines[#dtb_dislines]==#dtb_queu[1][dtb_curline] then
-            print("\143",118+mapDrawx,120,6)
+            print("\143",118+camx,120+camy,6)
         end
         for i=1,dislineslength do
-            print(dtb_dislines[i],4+mapDrawx,i*8+119-(dislineslength+offset)*8,7)
+            print(dtb_dislines[i],4+camx,(i*8+119-(dislineslength+offset)*8)+camy,7)
         end
     end
 end
@@ -160,10 +160,8 @@ function _init()
     focus.y=p.y
     focus.dir=left
 
-    mapDrawx=0
-    mapDrawy=0
-
-    screen=1
+    camx=0
+    camy=0
 end
 
 function _update()
@@ -181,7 +179,7 @@ function _update()
     player_spin()
 
     --1 tick has passed, reset text trigger
-    if(tick-textCD>1 and textCount==2) textInit=false
+    if(tick-textCD>2) textInit=false textCD=0
 
     --segment1
     create_npc(yellowFish)
@@ -207,23 +205,24 @@ function _draw()
     draw_npc(yellowFish,8,3)
     draw_npc(dog,10,5)
 
-    draw_npc(namazu,28,6)
-    draw_npc(dilFish,27,8)
+    draw_npc(namazu,20,6)
+    draw_npc(dilFish,25,8)
     npc_anim()
 
-    
     if (btn(4)) npc_talk()
 
     print(tick)
-    print(mget(focus.x+mapDrawx,focus.y+mapDrawy))
-    print(mapDrawx)
+    print(textInit)
+    print(textCD)
+    print(textCount)
+
     --draw text boxes
     dtb_draw()
 end
 
 function tile_check(x,y,flag)
     --check tile flag return tile flag bool
-    return fget(mget(x+mapDrawx,y+mapDrawy),flag)
+    return fget(mget(x,y),flag)
 end
 
 function make_player()
@@ -289,20 +288,22 @@ function make_npcs()
 end
 
 function update_map()
-    if(mapDrawx > 0) then
-        screen=2
-    end
+
 end
 
 function draw_map()
     --mapx=flr(p.x/16)*16
     --mapy=flr(p.y/16)*16
-    --camera(mapx*8,mapy*8) 
+   -- camera(mapx*8,mapy*8) 
 
-    if(p.x==0) mapDrawx-=15 p.x=14
-    if(p.x==15) mapDrawx+=15 p.x=1
+   camera(camx,camy)
 
-    map(mapDrawx,mapDrawy,0,0,128,128)
+    map(0,0,0,0,128,128)
+
+    if(p.x==15) camx+=128 p.x=17
+    if(p.y==15) camy+=128 p.y=17
+    if(p.x==16) camx-=128 p.x=14
+    if(p.y==16) camy-=128 p.y=14
 end
 
 function p_idle_anim()
@@ -431,13 +432,15 @@ function npc_talk()
             textInit=true 
 
             if(npcSprite_talk == yellowFish.sprite) then
-               dtb_disp(yellowFish.string1,function() textCount+=1 end)
-               dtb_disp(yellowFish.string2,function() textCount+=1 end)
+               dtb_disp(yellowFish.string1)
+               dtb_disp(yellowFish.string2,text_end)
                 yellowFish.spoken=true
             end
             if(npcSprite_talk == dog.sprite) then
-                dtb_disp(dog.string1,function() textCount+=1 end)
-                dtb_disp(dog.string2,function() textCount+=1 end)
+                dtb_disp(dog.string1)
+                dtb_disp(dog.string2,function() 
+                    textCount=1 
+                end)
                 dog.spoken=true
                 save_game()
             end
@@ -451,6 +454,8 @@ function npc_talk()
             if(npcSprite_talk == deel.sprite) then
             end
             if(npcSprite_talk == dilFish.sprite) then
+                dtb_disp("hey",function() textCount=1 end)
+                dilFish.spoken=true
             end
             if(npcSprite_talk == namazu.sprite) then
                 dtb_disp(namazu.string1,function() textCount+=1 end)
@@ -458,29 +463,31 @@ function npc_talk()
                 namazu.spoken=true
             end
             --once text has ended 
-            if(textCount == 2) then
+            if(textCount == 1) then
                 --save time
-                textCD =tick
-                --reset text counter 
-                textCount=0
-                
+                textCD=tick   
+                return          
             end
         end
     end
+end
+
+function text_end()
+    textCD=tick
 end
 
 function save_game()
     dset(0, p.x)
     dset(1, p.y)
 
-    dtb_disp("game has been saved", function() textCount+=2 end)
+    dtb_disp("game has been saved")
 end
 
 function load_game()
     p.x = dget(0)
     p.y = dget(1)
 
-    dtb_disp("game loaded",function() textCount+=2 end)
+    dtb_disp("game loaded")
 end
 
 function map_tileClear(x,y)
