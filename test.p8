@@ -76,6 +76,7 @@ end
 -- make sure that this function is called each update.
 function dtb_update()
     if #dtb_queu>0 then
+        textCD = t()
         if dtb_curline==0 then
             dtb_curline=1
         end
@@ -179,7 +180,9 @@ function _update()
     player_spin()
 
     --1 tick has passed, reset text trigger
-    if(tick-textCD>2) textInit=false textCD=0
+
+    if (btnp(4)) npc_talk()
+    if (t() - textCD > 0.5) textInit = false
 
     --segment1
     create_npc(yellowFish)
@@ -209,7 +212,7 @@ function _draw()
     draw_npc(dilFish,25,8)
     npc_anim()
 
-    if (btn(4)) npc_talk()
+
 
     print(tick)
     print(textInit)
@@ -430,6 +433,7 @@ function npc_talk()
             --get sprite # and pass to check name, returns text string 
             npcSprite_talk=mget(focus.x,focus.y)
             textInit=true 
+            textCD = t()
 
             if(npcSprite_talk == yellowFish.sprite) then
                dtb_disp(yellowFish.string1)
@@ -473,7 +477,7 @@ function npc_talk()
 end
 
 function text_end()
-    textCD=tick
+    -- empty
 end
 
 function save_game()
