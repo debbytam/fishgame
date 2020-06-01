@@ -152,6 +152,7 @@ function _init()
     make_player()
     make_npcs()
     make_map()
+    star_mapscan()
 
     game_over = false
     btnpress=0
@@ -237,9 +238,9 @@ function _draw()
     npc_anim()
 
     print(t())
-    print(pushx)
-    print(pushy)
-    print(pushSprite)
+    print(starx[3])
+    print(stary[3])
+    print(val)
 
     --draw text boxes
     dtb_draw()
@@ -330,7 +331,8 @@ function draw_map()
 
     map(0,0,0,0,128,128)
     --animate stars
-    star_mapscan()
+
+    star_anim()
 
     --screen1 right
     if(p.x==15) camx+=128 p.x=17 
@@ -361,14 +363,27 @@ function draw_map()
 end
 
 function star_mapscan()
+    starx={}
+    stary={}
+    --add star coords to array
     for x=0,16 do
         for y=16,30 do
-            if(mget(x,y)==68 and frameNum/2==0) then
-                mset(x,y,67)
-            elseif(mget(x,y)==67 and frameNum/3==0) then
-                mset(x,y,68)
+            if(mget(x,y)==68) then
+                add(starx,x)
+                add(stary,y)
             end
         end
+    end
+end
+
+function star_anim()
+    --flip sprite for every star coord
+    val=flr(rnd(#starx))
+
+    if(frameNum<10) then
+        mset(starx[val],stary[val],68)
+    else
+        mset(starx[val],stary[val],67)
     end
 end
 
